@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
@@ -121,37 +122,34 @@ public class Main {
                     switch (choix) {
                         case "1":
                             boolean quitter = false;
+                            Random rand = new Random();
+
                             while (!quitter) {
-                                System.out.println("Client " + idClient + " : Ajout d'une mesure");
+                                System.out.println("Client " + idClient + " : Ajout automatique d'une mesure");
 
-                                System.out.print("Température : ");
-                                double tmp = Double.parseDouble(scanner.nextLine());
+                                // === Génération aléatoire des valeurs ===
+                                double tmp = 15 + rand.nextDouble() * 15;        // 15 - 30°C
+                                double humidite = 30 + rand.nextDouble() * 50;   // 30% - 80%
+                                double pression = 990 + rand.nextDouble() * 40;  // 990 - 1030 hPa
 
-                                System.out.print("Humidité : ");
-                                double humidite = Double.parseDouble(scanner.nextLine());
-
-                                System.out.print("Pression : ");
-                                double pression = Double.parseDouble(scanner.nextLine());
+                                System.out.println("Température générée : " + tmp);
+                                System.out.println("Humidité générée : " + humidite);
+                                System.out.println("Pression générée : " + pression);
 
                                 // === 1. ENVOYER CODE -1 POUR SIGNALER UNE MESURE ===
                                 oos.writeInt(-1);
                                 oos.flush();
 
-                                Mesure mesure = new Mesure(idClient, tmp, humidite, pression);
+                                // === 2. Envoyer objet Mesure ===
+                                Mesure mesure = new Mesure(idClient, tmp, pression, humidite);
                                 oos.writeObject(mesure);
-                                oos.flush(); // Envoi immédiat
+                                oos.flush();
 
                                 System.out.println("Mesure envoyée au serveur !");
                                 Thread.sleep(3000);
 
-                                // Condition pour quitter
-                                System.out.println("Voulez-vous continuer à envoyer des mesures ? (o/n)");
-                                String reponse = scanner.nextLine();
-                                if (reponse.equalsIgnoreCase("n")) {
-                                    quitter = true;
-                                }
                             }
-                            break;
+
 
                         case "0":
                             System.out.println("Déconnexion...");
